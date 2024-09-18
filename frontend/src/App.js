@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import Layout from "./components/Layout"; // Import the Layout component
+import Users from "./pages/Users";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
               <PrivateRoute>
                 <Layout>
                   <h2 className="text-3xl font-bold">User Management</h2>
+                  <Users />
                   {/* Content related to managing users */}
                 </Layout>
               </PrivateRoute>
