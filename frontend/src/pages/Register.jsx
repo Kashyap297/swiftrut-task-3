@@ -8,10 +8,45 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
   const navigate = useNavigate();
+
+  // Client-side validation function
+  const validate = () => {
+    let errors = {};
+
+    if (!username) {
+      errors.username = "Username is required";
+    } else if (username.length < 3) {
+      errors.username = "Username must be at least 3 characters";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      errors.email = "Email is required";
+    } else if (!emailRegex.test(email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    if (!password) {
+      errors.password = "Password is required";
+    } else if (password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+    }
+
+    return errors;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Run validation
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     try {
       await register(username, email, password);
       navigate("/");
@@ -44,10 +79,20 @@ const Register = () => {
                 id="username"
                 type="text"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setValidationErrors((prev) => ({ ...prev, username: "" }));
+                }}
                 placeholder="Enter your username"
-                className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className={`shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                  validationErrors.username ? "border-red-500" : ""
+                }`}
               />
+              {validationErrors.username && (
+                <p className="text-red-500 text-xs italic">
+                  {validationErrors.username}
+                </p>
+              )}
             </div>
           </div>
           <div className="mb-6">
@@ -62,10 +107,20 @@ const Register = () => {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setValidationErrors((prev) => ({ ...prev, email: "" }));
+                }}
                 placeholder="Enter your email"
-                className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className={`shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                  validationErrors.email ? "border-red-500" : ""
+                }`}
               />
+              {validationErrors.email && (
+                <p className="text-red-500 text-xs italic">
+                  {validationErrors.email}
+                </p>
+              )}
             </div>
           </div>
           <div className="mb-6">
@@ -80,10 +135,20 @@ const Register = () => {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setValidationErrors((prev) => ({ ...prev, password: "" }));
+                }}
                 placeholder="Enter your password"
-                className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className={`shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                  validationErrors.password ? "border-red-500" : ""
+                }`}
               />
+              {validationErrors.password && (
+                <p className="text-red-500 text-xs italic">
+                  {validationErrors.password}
+                </p>
+              )}
             </div>
           </div>
           <div className="flex items-center justify-center">

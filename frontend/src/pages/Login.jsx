@@ -9,13 +9,31 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
 
+  // Client-side validation
+  const validateForm = () => {
+    if (!email || !password) {
+      setErrorMessage("Please enter both email and password.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return; // If validation fails, prevent submission
+
     try {
       await login(email, password);
       navigate("/");
     } catch (error) {
-      setErrorMessage("Login failed. Please try again.");
+      // Handle backend error responses
+      if (error.response && error.response.status === 401) {
+        setErrorMessage("Invalid email or password.");
+      } else if (error.response && error.response.status === 404) {
+        setErrorMessage("User does not exist.");
+      } else {
+        setErrorMessage("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
