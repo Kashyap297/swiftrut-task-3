@@ -30,8 +30,6 @@ const Register = () => {
 
     if (!password) {
       errors.password = "Password is required";
-    } else if (password.length < 6) {
-      errors.password = "Password must be at least 6 characters";
     }
 
     return errors;
@@ -51,7 +49,11 @@ const Register = () => {
       await register(username, email, password);
       navigate("/");
     } catch (error) {
-      setErrorMessage("Registration failed. Please try again.");
+      if (error.response && error.response.status === 400) {
+        setErrorMessage(error.response.data.message); // Display server validation errors
+      } else {
+        setErrorMessage("Registration failed. Please try again.");
+      }
     }
   };
 

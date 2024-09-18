@@ -20,7 +20,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return; // If validation fails, prevent submission
+    if (!validateForm()) return;
 
     try {
       await login(email, password);
@@ -30,7 +30,13 @@ const Login = () => {
       if (error.response && error.response.status === 401) {
         setErrorMessage("Invalid email or password.");
       } else if (error.response && error.response.status === 404) {
-        setErrorMessage("User does not exist.");
+        // If the user does not exist, redirect to register page
+        setErrorMessage("User does not exist. Redirecting to Register...");
+        setTimeout(() => {
+          navigate("/register");
+        }, 2000); // Wait for 2 seconds before redirecting to the register page
+      } else if (error.response && error.response.status === 400) {
+        setErrorMessage(error.response.data.message); // Handling custom error messages from backend
       } else {
         setErrorMessage("An unexpected error occurred. Please try again.");
       }
