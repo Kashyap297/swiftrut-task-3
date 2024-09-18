@@ -2,9 +2,11 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-// Generate JWT token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
+// Generate JWT token with id and username
+const generateToken = (id, username) => {
+  return jwt.sign({ id, username }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
 };
 
 // Register new user
@@ -46,7 +48,7 @@ const registerUser = async (req, res) => {
       username: user.username,
       email: user.email,
       role: user.role,
-      token: generateToken(user._id),
+      token: generateToken(user._id, user.username), // Pass both id and username
     });
   } catch (error) {
     console.error("Error during registration:", error);
@@ -76,7 +78,7 @@ const loginUser = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-        token: generateToken(user._id),
+        token: generateToken(user._id, user.username), // Pass both id and username
       });
     } else {
       // Invalid credentials
