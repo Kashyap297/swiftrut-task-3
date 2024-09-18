@@ -8,18 +8,16 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login"); // Redirect to login after logout
+    navigate("/login");
   };
   console.log(user);
   return (
     <div className="w-64 bg-gray-800 h-screen p-5 text-white fixed lg:static">
       <h1 className="text-3xl font-semibold mb-10">taskZen</h1>
 
-      {/* User Info */}
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-2">
-          Welcome, {user?.username || "Guest"}{" "}
-          {/* This will print the username */}
+          Welcome, {user?.username || "Guest"}
         </h2>
       </div>
 
@@ -29,18 +27,22 @@ const Sidebar = () => {
             Dashboard
           </Link>
         </li>
-        <li className="mb-4">
-          <Link to="/users" className="text-lg hover:text-gray-400">
-            Manage Users
-          </Link>
-        </li>
+
+        {/* Show Manage Users link only if role is admin */}
+        {user?.role === "admin" && (
+          <li className="mb-4">
+            <Link to="/users" className="text-lg hover:text-gray-400">
+              Manage Users
+            </Link>
+          </li>
+        )}
+
         <li className="mb-4">
           <Link to="/tasks" className="text-lg hover:text-gray-400">
             Manage Tasks
           </Link>
         </li>
 
-        {/* Logout Button */}
         <li className="mb-4">
           <button
             onClick={handleLogout}
