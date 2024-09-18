@@ -13,7 +13,7 @@ const Sidebar = () => {
   console.log(user);
   return (
     <div className="w-64 bg-gray-800 h-screen p-5 text-white fixed lg:static">
-      <h1 className="text-3xl font-semibold mb-10">Admin Panel</h1>
+      <h1 className="text-3xl font-semibold mb-10">taskZen</h1>
 
       {/* User Info */}
       <div className="mb-6">
