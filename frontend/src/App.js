@@ -5,16 +5,31 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
-import Layout from "./components/Layout"; // Import the Layout component
+import Layout from "./components/Layout";
 import Users from "./pages/Users";
+import RedirectIfAuthenticated from "./components/RedirectIfAuthenticated"; // Import the Redirect component
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/register"
+            element={
+              <RedirectIfAuthenticated>
+                <Register />
+              </RedirectIfAuthenticated>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <RedirectIfAuthenticated>
+                <Login />
+              </RedirectIfAuthenticated>
+            }
+          />
           {/* Wrapping admin routes inside Layout */}
           <Route
             path="/"
@@ -26,7 +41,6 @@ function App() {
               </PrivateRoute>
             }
           />
-          {/* Add other admin-related routes inside the Layout */}
           <Route
             path="/users"
             element={
@@ -34,7 +48,6 @@ function App() {
                 <Layout>
                   <h2 className="text-3xl font-bold">User Management</h2>
                   <Users />
-                  {/* Content related to managing users */}
                 </Layout>
               </PrivateRoute>
             }
@@ -45,7 +58,6 @@ function App() {
               <PrivateRoute>
                 <Layout>
                   <h2 className="text-3xl font-bold">Task Management</h2>
-                  {/* Content related to managing tasks */}
                 </Layout>
               </PrivateRoute>
             }

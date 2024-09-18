@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; // Correct import
+import { jwtDecode } from "jwt-decode";
 
 export const AuthContext = createContext();
 
@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      const decodedUser = jwtDecode(token); // Correct usage of jwtDecode
+      const decodedUser = jwtDecode(token);
       setUser(decodedUser);
     }
     setLoading(false);
@@ -21,11 +21,14 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axios.post(
         "http://localhost:8000/api/users/login",
-        { email, password }
+        {
+          email,
+          password,
+        }
       );
       const { token } = response.data;
       localStorage.setItem("token", token);
-      const decodedUser = jwtDecode(token); // Correct usage of jwtDecode
+      const decodedUser = jwtDecode(token);
       setUser(decodedUser);
     } catch (error) {
       console.error("Login error", error);
@@ -44,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       );
       const { token } = response.data;
       localStorage.setItem("token", token);
-      const decodedUser = jwtDecode(token); // Correct usage of jwtDecode
+      const decodedUser = jwtDecode(token);
       setUser(decodedUser);
     } catch (error) {
       console.error("Registration error", error);
