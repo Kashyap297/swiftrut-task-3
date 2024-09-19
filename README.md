@@ -14,3 +14,4 @@ start - npm start
 // frontend start
 npm start
 
+api created for create by admin and user and fetch task for admin to all and individual user
