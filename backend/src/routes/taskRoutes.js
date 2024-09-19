@@ -1,17 +1,34 @@
 const express = require("express");
 const {
   createTask,
-  getTasks,
+  getAllTasks,
+  getUserTasks, // Import user-specific tasks
   updateTask,
   deleteTask,
 } = require("../controllers/taskController");
-const { protect, admin } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.post("/", protect, createTask); // Only authenticated users can create tasks
-router.get("/", protect, getTasks); // Authenticated users can get tasks
-router.put("/:id", protect, updateTask); // Authenticated users can update tasks
-router.delete("/:id", protect, deleteTask); // Authenticated users can delete tasks
+// Create a new task (authenticated users)
+router.post("/", protect, createTask);
+
+// Get all tasks (admin can view all, regular users see their own tasks)
+router.get("/", protect, (req, res) => {
+  if (req.user.role === "admin") {
+    getAllTasks(req, res); // Admin sees all tasks
+  } else {
+    getUserTasks(req, res); // Regular users see their own tasks
+  }
+});
+
+// **Fetch tasks for logged-in user**
+router.get("/my-tasks", protect, getUserTasks);
+
+// Update task (only admin or task creator)
+router.put("/:id", protect, updateTask);
+
+// Delete task (only admin or task creator)
+router.delete("/:id", protect, deleteTask);
 
 module.exports = router;

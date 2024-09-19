@@ -3,111 +3,98 @@ const Task = require("../models/taskModel");
 // Create a new task
 const createTask = async (req, res) => {
   const { title, description, category, assignedTo, dueDate } = req.body;
-  const userId = req.user.id;
-
-  if (!title || !description) {
-    return res
-      .status(400)
-      .json({ message: "Please provide all required fields" });
-  }
 
   try {
     const task = await Task.create({
       title,
       description,
       category,
+      status: "pending", // Default status
       assignedTo,
-      createdBy: userId,
+      createdBy: req.user._id, // The user who is logged in and creating the task
       dueDate,
     });
+
     res.status(201).json(task);
   } catch (error) {
-    console.error("Error creating task:", error);
-    res.status(500).json({ message: "Server error while creating task" });
+    res
+      .status(500)
+      .json({ message: "Error creating task", error: error.message });
   }
 };
 
-// Get all tasks (Admins can view all tasks, regular users only their own)
-const getTasks = async (req, res) => {
+// Fetch all tasks
+const getAllTasks = async (req, res) => {
   try {
-    let tasks;
-    if (req.user.role === "admin") {
-      tasks = await Task.find().populate(
-        "assignedTo createdBy",
-        "username email"
-      );
-    } else {
-      tasks = await Task.find({ createdBy: req.user.id }).populate(
-        "assignedTo",
-        "username email"
-      );
-    }
+    const tasks = await Task.find()
+      .populate("assignedTo", "username email")
+      .populate("createdBy", "username email");
     res.status(200).json(tasks);
   } catch (error) {
-    console.error("Error fetching tasks:", error);
-    res.status(500).json({ message: "Server error while fetching tasks" });
+    res
+      .status(500)
+      .json({ message: "Error fetching tasks", error: error.message });
   }
 };
 
-// Update a task (Only admin or task creator)
-const updateTask = async (req, res) => {
-  const taskId = req.params.id;
-
+// Fetch tasks for the logged-in user
+const getUserTasks = async (req, res) => {
   try {
-    let task = await Task.findById(taskId);
-
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
-    }
-
-    if (
-      req.user.role !== "admin" &&
-      task.createdBy.toString() !== req.user.id
-    ) {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized to update this task" });
-    }
-
-    task = await Task.findByIdAndUpdate(taskId, req.body, { new: true });
-    res.status(200).json(task);
+    const tasks = await Task.find({ createdBy: req.user._id });
+    res.status(200).json(tasks);
   } catch (error) {
-    console.error("Error updating task:", error);
-    res.status(500).json({ message: "Server error while updating task" });
+    res
+      .status(500)
+      .json({ message: "Error fetching user tasks", error: error.message });
   }
 };
 
-// Delete a task (Only admin or task creator)
-const deleteTask = async (req, res) => {
-  const taskId = req.params.id;
+// Update a task status or details
+const updateTask = async (req, res) => {
+  const { taskId } = req.params;
+  const { status, title, description, dueDate } = req.body;
 
   try {
     const task = await Task.findById(taskId);
 
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
-    }
+    if (!task) return res.status(404).json({ message: "Task not found" });
 
-    if (
-      req.user.role !== "admin" &&
-      task.createdBy.toString() !== req.user.id
-    ) {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized to delete this task" });
-    }
+    // Update task fields
+    if (status) task.status = status;
+    if (title) task.title = title;
+    if (description) task.description = description;
+    if (dueDate) task.dueDate = dueDate;
 
-    await task.remove();
-    res.status(200).json({ message: "Task deleted successfully" });
+    await task.save();
+
+    res.status(200).json(task);
   } catch (error) {
-    console.error("Error deleting task:", error);
-    res.status(500).json({ message: "Server error while deleting task" });
+    res
+      .status(500)
+      .json({ message: "Error updating task", error: error.message });
+  }
+};
+
+// Delete a task
+const deleteTask = async (req, res) => {
+  const { taskId } = req.params;
+
+  try {
+    const task = await Task.findByIdAndDelete(taskId);
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    res.status(200).json({ message: "Task deleted" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting task", error: error.message });
   }
 };
 
 module.exports = {
   createTask,
-  getTasks,
+  getAllTasks,
+  getUserTasks,
   updateTask,
   deleteTask,
 };
