@@ -3,6 +3,7 @@ const dbConnection = require("./config/db");
 const Config = require("./config");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
+const taskRoutes = require("./routes/taskRoutes");
 
 const app = express();
 
@@ -18,6 +19,7 @@ dbConnection();
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/tasks", taskRoutes);
 
 app.listen(PORT, (err) => {
   if (err) {
